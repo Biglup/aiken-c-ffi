@@ -75,7 +75,7 @@ const char* eval_phase_two(
     const char* outputs,
     const char* cost_mdls,
     InitialBudget initial_budget,
-    SlotConfig slot_config
+    SlotConfig* slot_config
 );
 
 /**
