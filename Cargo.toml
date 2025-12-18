@@ -1,6 +1,6 @@
 [package]
-name = "aiken-jna-wrapper"
-version = "0.7.0"
+name = "aiken-c-ffi"
+version = "1.1.13"
 edition = "2021"
 authors = ["satran004", "matiwinnetou"]
 
@@ -10,14 +10,14 @@ authors = ["satran004", "matiwinnetou"]
 crate-type = ["cdylib"]
 
 [dependencies]
-uplc = "1.1.13"
-aiken-lang = "1.1.13"
+uplc = "1.1.21"
+aiken-lang = "1.1.21"
 
-pallas-addresses = "0.32.0"
-pallas-codec = { version = "0.32.0", features = ["num-bigint"] }
-pallas-crypto = "0.32.0"
-pallas-primitives = "0.32.0"
-pallas-traverse = "0.32.0"
+pallas-addresses = "0.33.0"
+pallas-codec = { version = "0.33.0", features = ["num-bigint"] }
+pallas-crypto = "0.33.0"
+pallas-primitives = "0.33.0"
+pallas-traverse = "0.33.0"
 
 ffi-support = "0.4.4"
 jni = "0.21.1"

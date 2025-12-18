@@ -18,36 +18,50 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # a list of all the targets
         include:
+          # Ubuntu
           - TARGET: x86_64-unknown-linux-gnu
-            OS: ubuntu-20.04
-            LIB_NAME: libaiken_jna_wrapper.so
-            TARGET_NAME: linux-x86-64_libaiken_jna_wrapper.so
-#          - TARGET: aarch64-unknown-linux-gnu
-#            OS: ubuntu-20.04
-#            LIB_NAME: libaiken_jna_wrapper.so
-#            TARGET_NAME: linux-aarch64_libaiken_jna_wrapper.so
+            OS: ubuntu-22.04
+            ARCH: x86_64
+            COMPILER: gcc
+            LIB_NAME: libaiken_c_ffi.so
+            TARGET_NAME: linux-x86_64-gcc_libaiken_c_ffi.so
+          - TARGET: aarch64-unknown-linux-gnu
+            OS: ubuntu-22.04
+            ARCH: arm64
+            COMPILER: gcc
+            LIB_NAME: libaiken_c_ffi.so
+            TARGET_NAME: linux-arm64-gcc_libaiken_c_ffi.so
+          # macOS
           - TARGET: x86_64-apple-darwin
             OS: macos-latest
-            LIB_NAME: libaiken_jna_wrapper.dylib
-            TARGET_NAME: darwin-x86-64_libaiken_jna_wrapper.dylib
+            ARCH: x86_64
+            COMPILER: gcc
+            LIB_NAME: libaiken_c_ffi.dylib
+            TARGET_NAME: darwin-x86_64-gcc_libaiken_c_ffi.dylib
           - TARGET: aarch64-apple-darwin
             OS: macos-latest
-            LIB_NAME: libaiken_jna_wrapper.dylib
-            TARGET_NAME: darwin-aarch64_libaiken_jna_wrapper.dylib
+            ARCH: arm64
+            COMPILER: gcc
+            LIB_NAME: libaiken_c_ffi.dylib
+            TARGET_NAME: darwin-arm64-gcc_libaiken_c_ffi.dylib
+          # Windows
           - TARGET: x86_64-pc-windows-msvc
             OS: windows-latest
-            LIB_NAME: aiken_jna_wrapper.dll
-            TARGET_NAME: windows-x86-64_aiken_jna_wrapper.dll
-          - TARGET: aarch64-pc-windows-msvc
+            ARCH: x86_64
+            COMPILER: msvc
+            LIB_NAME: aiken_c_ffi.dll
+            TARGET_NAME: windows-x86_64-msvc_aiken_c_ffi.dll
+          - TARGET: x86_64-pc-windows-gnu
             OS: windows-latest
-            LIB_NAME: aiken_jna_wrapper.dll
-            TARGET_NAME: windows-aarch64_aiken_jna_wrapper.dll
+            ARCH: x86_64
+            COMPILER: mingw
+            LIB_NAME: aiken_c_ffi.dll
+            TARGET_NAME: windows-x86_64-mingw_aiken_c_ffi.dll
 #    needs: test
     runs-on: ${{ matrix.OS }}
     env:
-      NAME: libaiken_jna_wrapper
+      NAME: libaiken_c_ffi
       TARGET: ${{ matrix.TARGET }}
       OS: ${{ matrix.OS }}
       LIB_NAME: ${{ matrix.LIB_NAME }}
@@ -65,27 +79,21 @@ jobs:
         run: find ./
       - name: Install and configure dependencies
         run: |
-          # dependencies are only needed on ubuntu as that's the only place where
-          # we make cross-compilation
+          # Ubuntu: install cross-compilation tools
           if [[ $OS =~ ^ubuntu.*$ ]]; then
             sudo apt-get update
             sudo apt-get install -qq crossbuild-essential-arm64 crossbuild-essential-armhf libssl-dev
           fi
 
-          # some additional configuration for cross-compilation on linux
+          # Windows mingw: add mingw to PATH
+          if [[ $OS == "windows-latest" && $TARGET == "x86_64-pc-windows-gnu" ]]; then
+            echo "C:\msys64\mingw64\bin" >> $GITHUB_PATH
+          fi
+
+          # Linux cross-compilation configuration
           cat >>~/.cargo/config <<EOF
           [target.aarch64-unknown-linux-gnu]
           linker = "aarch64-linux-gnu-gcc"
-          [target.aarch64-unknown-linux-musl]
-          linker = "aarch64-linux-gnu-gcc"
-          [target.armv7-unknown-linux-gnueabihf]
-          linker = "arm-linux-gnueabihf-gcc"
-          [target.armv7-unknown-linux-musleabihf]
-          linker = "arm-linux-gnueabihf-gcc"
-          [target.arm-unknown-linux-gnueabihf]
-          linker = "arm-linux-gnueabihf-gcc"
-          [target.arm-unknown-linux-musleabihf]
-          linker = "arm-linux-gnueabihf-gcc"
           EOF
       - name: Install rust target
         run: rustup target add $TARGET

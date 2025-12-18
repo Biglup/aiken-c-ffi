@@ -11,7 +11,6 @@ use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::{mem, panic};
 
-#[no_mangle]
 #[repr(C)]
 #[allow(missing_copy_implementations)]
 #[derive(Clone)]
@@ -21,7 +20,6 @@ pub struct SlotConfig {
     pub zero_time: u64,
 }
 
-#[no_mangle]
 #[repr(C)]
 #[allow(missing_copy_implementations)]
 #[derive(Clone)]
@@ -171,7 +169,7 @@ fn to_ptr(string: String) -> *const c_char {
 #[no_mangle]
 #[allow(non_snake_case)]
 fn dropCharPointer(pointer: *const c_char) {
-    mem::drop(pointer);
+    let _ = pointer;
 }
 
 fn json_fallback() -> String {
