@@ -55,8 +55,8 @@ pub fn eval_phase_two(
     inputs: *const c_char,
     outputs: *const c_char,
     cost_mdls: *const c_char,
-    initial_budget: InitialBudget,
-    slot_config: SlotConfig,
+    initial_budget: &InitialBudget, 
+    slot_config: &SlotConfig,
 ) -> *const c_char {
     let result: Result<*const c_char, Box<dyn Any + Send>> = panic::catch_unwind(|| {
         return eval_phase_two_inner(
@@ -64,8 +64,8 @@ pub fn eval_phase_two(
             to_string(inputs),
             to_string(outputs),
             to_string(cost_mdls),
-            initial_budget,
-            slot_config,
+            initial_budget.clone(),
+            slot_config.clone(),
         );
     })
     .map(|json| to_ptr(json));
