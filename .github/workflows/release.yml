@@ -32,6 +32,18 @@ jobs:
             COMPILER: gcc
             LIB_NAME: libaiken_c_ffi.so
             TARGET_NAME: linux-arm64-gcc_libaiken_c_ffi.so
+          - TARGET: armv7-unknown-linux-gnueabihf
+            OS: ubuntu-22.04
+            ARCH: armv7
+            COMPILER: gcc
+            LIB_NAME: libaiken_c_ffi.so
+            TARGET_NAME: linux-armv7-gcc_libaiken_c_ffi.so
+          - TARGET: arm-unknown-linux-gnueabihf
+            OS: ubuntu-22.04
+            ARCH: armv6
+            COMPILER: gcc
+            LIB_NAME: libaiken_c_ffi.so
+            TARGET_NAME: linux-armv6-gcc_libaiken_c_ffi.so
           # macOS
           - TARGET: x86_64-apple-darwin
             OS: macos-latest
@@ -94,6 +106,10 @@ jobs:
           cat >>~/.cargo/config <<EOF
           [target.aarch64-unknown-linux-gnu]
           linker = "aarch64-linux-gnu-gcc"
+          [target.armv7-unknown-linux-gnueabihf]
+          linker = "arm-linux-gnueabihf-gcc"
+          [target.arm-unknown-linux-gnueabihf]
+          linker = "arm-linux-gnueabihf-gcc"
           EOF
       - name: Install rust target
         run: rustup target add $TARGET
