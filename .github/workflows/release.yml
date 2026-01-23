@@ -41,7 +41,7 @@ jobs:
           - TARGET: arm-unknown-linux-gnueabihf
             OS: ubuntu-22.04
             ARCH: armv6
-            COMPILER: gcc
+            COMPILER: zig
             LIB_NAME: libaiken_c_ffi.so
             TARGET_NAME: linux-armv6-gcc_libaiken_c_ffi.so
           # macOS
@@ -95,6 +95,15 @@ jobs:
           if [[ $OS =~ ^ubuntu.*$ ]]; then
             sudo apt-get update
             sudo apt-get install -qq crossbuild-essential-arm64 crossbuild-essential-armhf libssl-dev
+
+            # ARMv6 (Pi Zero) requires Zig for proper hard-float cross-compilation
+            if [[ "${{ matrix.ARCH }}" == "armv6" ]]; then
+              sudo snap install zig --classic --beta
+              # Create zig linker wrapper for ARMv6
+              echo '#!/bin/bash' | sudo tee /usr/local/bin/zig-cc
+              echo 'zig cc -target arm-linux-gnueabihf -mcpu=arm1176jzf_s "$@"' | sudo tee -a /usr/local/bin/zig-cc
+              sudo chmod +x /usr/local/bin/zig-cc
+            fi
           fi
 
           # Windows mingw: add mingw to PATH
@@ -109,7 +118,7 @@ jobs:
           [target.armv7-unknown-linux-gnueabihf]
           linker = "arm-linux-gnueabihf-gcc"
           [target.arm-unknown-linux-gnueabihf]
-          linker = "arm-linux-gnueabihf-gcc"
+          linker = "zig-cc"
           EOF
       - name: Install rust target
         run: rustup target add $TARGET
